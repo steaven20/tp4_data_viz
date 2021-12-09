@@ -394,7 +394,12 @@
 
       d3.json("got_social_graph.json").then(function (d) {
         //deux partie node et link dans json
-        adjancencymatrix = createAdjacencyMatrix(d.nodes, d.links);
+        adjancencymatrix = createAdjacencyMatrix(
+          d.nodes,
+          d.links,
+          undefined,
+          true
+        );
 
         //console.log(adjancencymatrix[0]);
 
@@ -409,6 +414,17 @@
             })
           ]) // TODO
           .range(d3.schemeBlues[9]); // donné par D3
+
+        var maxWeight = adjancencymatrix[0].weight;
+        //part 6 cherche max
+        for (var x = 0; x < adjancencymatrix.length; x++) {
+          if (maxWeight < adjancencymatrix[x].weight) {
+            maxWeight = adjancencymatrix[x].weight;
+          }
+        }
+
+        //part 6
+        var zoneScale = d3.scaleOrdinal(d3.schemeCategory10);
         //part 4
         var coordonneIni = 50;
         matrixViz = svg
@@ -423,17 +439,19 @@
           .attr("y", function (d) {
             return d.y * 5 + coordonneIni;
           })
-          .style("stroke", "black")
+          .style("stroke", "white")
           .style("stroke-width", ".2px")
+          .style("opacity", function (d) {
+            var value = (d.weight / maxWeight) * 100 * 10;
+            return value + "%";
+          })
           .style("fill", function (d) {
-            var value = d.weight;
-
-            if (value) {
+            if (d.zone_s == d.zone_t) {
               //console.log(scale(value));
-              return scale(value);
+              return zoneScale(d.zone_s);
             } else {
               // si pas de valeur alors en gris
-              return scale(0);
+              return "#eee";
             }
           });
 
