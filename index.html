@@ -7,6 +7,14 @@
   </head>
 
   <body>
+    <p>Select a new critical for the map.</p>
+
+    <select id="mySelect" onchange="">
+      <option value="1">appearances</option>
+      <option value="2">zones</option>
+      <option value="3">influences</option>
+    </select>
+
     <div id="visu-tp4"></div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
@@ -501,6 +509,106 @@
           .attr("x", 0)
           .attr("text-anchor", "end")
           .text((d) => d.character);
+
+        //part 7
+        //newPositions = 1 -> default
+        //newPositions = 2 -> tirer par zone
+        //newPositions = 3 ->tirer par influence
+        function update(newPositions, d) {
+          //cherche domaine de echellexy
+          if (newPositions == 1) {
+            positionsPersonnages = d3.range(d.nodes.length);
+          } else if (newPositions == 2) {
+            //tri tab en croissant avec zone
+            //met valeur de zone dans tabValZone
+            //met indice de nodes dans tabIni
+            var longeur = d.nodes.length;
+            var tabIni = d3.range(d.nodes.length);
+            var tabValZone = d3.range(d.nodes.length);
+            for (var i = 0; i < d.nodes.length; i++) {
+              tabValZone[i] = d.nodes[i].zone;
+            }
+            var tmp1, tmp2, jmin, minZone, indiceMinZone;
+
+            for (var i = 0; i < longeur; i++) {
+              //i est la position de cherche min zone
+
+              minZone = tabValZone[i];
+              indiceMinZone = tabIni[i];
+              jmin = i;
+              for (var j = i; j < longeur; j++) {
+                if (tabValZone[j] < minZone) {
+                  minZone = tabValZone[j];
+                  indiceMinZone = tabIni[j];
+                  jmin = j;
+                }
+              }
+              tmp1 = tabValZone[i];
+              tmp2 = tabIni[i];
+              tabValZone[i] = minZone;
+              tabIni[i] = indiceMinZone;
+              tabValZone[jmin] = tmp1;
+              tabIni[jmin] = tmp2;
+            }
+            //console.log(tabIni);
+            //console.log(tabValZone);
+            positionsPersonnages = tabIni;
+          } else if (newPositions == 3) {
+            //tri tab en decroissant avec weight
+            var longeur = d.nodes.length;
+            var tabIni = d3.range(d.nodes.length);
+            var tabValZone = d3.range(d.nodes.length);
+            for (var i = 0; i < d.nodes.length; i++) {
+              tabValZone[i] = d.nodes[i].influence;
+            }
+            var tmp1, tmp2, jmax, maxInfluence, indiceMaxInfluence;
+            for (var i = 0; i < longeur; i++) {
+              //i est la position de cherche min zone
+
+              maxInfluence = tabValZone[i];
+              indiceMaxInfluence = tabIni[i];
+              jmax = i;
+              for (var j = i; j < longeur; j++) {
+                if (tabValZone[j] > maxInfluence) {
+                  maxInfluence = tabValZone[j];
+                  indiceMaxInfluence = tabIni[j];
+                  jmax = j;
+                }
+              }
+              tmp1 = tabValZone[i];
+              tmp2 = tabIni[i];
+              tabValZone[i] = maxInfluence;
+              tabIni[i] = indiceMaxInfluence;
+              tabValZone[jmax] = tmp1;
+              tabIni[jmax] = tmp2;
+            }
+            positionsPersonnages = tabIni;
+          }
+          echellexy.domain(positionsPersonnages);
+          //modifier les axes
+          rows.attr("dy", function (d) {
+            //console.log(echellexy(d.id));
+            return echellexy(d.id) + 5 - (d.id * 5 + 5);
+          });
+          columns.attr("dy", function (d) {
+            //console.log(echellexy(d.id));
+            return echellexy(d.id) + 5 - (d.id * 5 + 5);
+          });
+          //modifier matrice
+
+          d3.selectAll("rect")
+            .attr("x", function (d) {
+              return echellexy(d.x) + coordonneIni;
+            })
+            .attr("y", function (d) {
+              return echellexy(d.y) + coordonneIni;
+            });
+        }
+
+        d3.select("#mySelect").on("click", function () {
+          update(this.value, d);
+          //console.log(this.value);
+        });
       });
     </script>
   </body>
