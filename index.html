@@ -586,17 +586,28 @@
           }
           echellexy.domain(positionsPersonnages);
           //modifier les axes
-          rows.attr("dy", function (d) {
-            //console.log(echellexy(d.id));
-            return echellexy(d.id) + 5 - (d.id * 5 + 5);
-          });
-          columns.attr("dy", function (d) {
-            //console.log(echellexy(d.id));
-            return echellexy(d.id) + 5 - (d.id * 5 + 5);
-          });
+          rows
+            .transition()
+            .delay(500)
+            .duration(3000)
+            .attr("dy", function (d) {
+              //console.log(echellexy(d.id));
+              return echellexy(d.id) + 5 - (d.id * 5 + 5);
+            });
+          columns
+            .transition()
+            .delay(500)
+            .duration(3000)
+            .attr("dy", function (d) {
+              //console.log(echellexy(d.id));
+              return echellexy(d.id) + 5 - (d.id * 5 + 5);
+            });
           //modifier matrice
 
           d3.selectAll("rect")
+            .transition()
+            .delay(500)
+            .duration(3000)
             .attr("x", function (d) {
               return echellexy(d.x) + coordonneIni;
             })
